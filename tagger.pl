@@ -30,7 +30,8 @@ if(open(my $fh, "<:encoding(UTF-8)", $train)){
     # For each word/tag pair in the training set,
     # increment %tokens{word}{tag}
     foreach my $rule (@rules){
-        my @split = split(/\//, $rule);
+        my @split = split(/(?<!\\)\//, $rule);
+        $split[1] =~ s/^(.+)\|.*/\1/;
         $tokens{$split[0]}{$split[1]}++;
     }
 

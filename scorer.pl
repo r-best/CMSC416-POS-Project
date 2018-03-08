@@ -1,4 +1,5 @@
 use Text::Table;
+use Data::Dumper;
 
 sub println { print "@_"."\n" }
 
@@ -29,26 +30,30 @@ if(!(-f $keyFile)){
     die "Key file '$keyFile' does not exist";
 }
 
-my @input;
-my @key;
+my @input = processInputFile($inputFile);
+my @key = processInputFile($keyFile);
 
 my $correct = 0;
 my $total = 0;
 
-@input = processInputFile($inputFile);
-@key = processInputFile($keyFile);
+my %predictions;
 
 my $table = Text::Table->new();
 
 for(my $i = 0; $i < 0+@input; $i++){
-    my $inputTag = (split(/\//, $input[$i]))[1];
-    my $keyTag = (split(/\//, $key[$i]))[1];
+    my $inputTag = (split(/(?<!\\)\//, $input[$i]))[1];
+    my $keyTag = (split(/(?<!\\)\//, $key[$i]))[1];
+    $inputTag =~ s/^(.*)\|/$1/;
+    $keyTag =~ s/^(.*)\|/$1/;
+
+    $predictions{$keyTag}{$inputTag}++;
 
     if($inputTag eq $keyTag){
         $correct++;
     }
     $total++;
 }
+println Dumper(%predictions);
 println "CORRECT: ".$correct;
 println "TOTAL: ".$total;
 println ($correct / $total)."%";
