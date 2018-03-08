@@ -1,4 +1,19 @@
+use Text::Table;
+
 sub println { print "@_"."\n" }
+
+sub processInputFile($) {
+    my $file = @_[0];
+    if(open(my $fh, "<:encoding(UTF-8)", $file)){
+        my $text = do { local $/; <$fh> }; # Read in the entire file as a string
+        chomp $text;
+        $text =~ s/[\[\]]//g;
+        return split(/[\s\n]+/, $text);
+        close $file;
+    } else {
+        die "Error opening file '$file'";
+    }
+}
 
 if(0+@ARGV < 2){
     die "At least 2 arguments required";
@@ -14,32 +29,26 @@ if(!(-f $keyFile)){
     die "Key file '$keyFile' does not exist";
 }
 
+my @input;
+my @key;
+
 my $correct = 0;
 my $total = 0;
 
-if(open(my $fhI, "<:encoding(UTF-8)", $inputFile)){
-    if(open(my $fhK, "<:encoding(UTF-8)", $keyFile)){
-        my $inputText = do { local $/; <$fhI> }; # Read in the entire file as a string
-        my $keyText = do { local $/; <$fhK> }; # Read in the entire file as a string
-        
-        my @inputTokens = split(/[\s\n]+/, $inputText);
-        my @keyTokens = split(/[\s\n]+/, $keyText);
+@input = processInputFile($inputFile);
+@key = processInputFile($keyFile);
 
-        for(my $i = 0; $i < 0+@inputTokens; $i++){
-            my $inputTag = (split(/\//, $inputTokens[$i]))[1];
-            my $keyTag = (split(/\//, $keyTokens[$i]))[1];
+my $table = Text::Table->new();
 
-            if($inputTag eq $keyTag){
-                $correct++;
-            }
-            $total++;
-        }
-        println "CORRECT: ".$correct;
-        println "TOTAL: ".$total;
-        println ($correct / $total)."%";
-    } else {
-        die "Error opening key file '$keyFile'";
+for(my $i = 0; $i < 0+@input; $i++){
+    my $inputTag = (split(/\//, $input[$i]))[1];
+    my $keyTag = (split(/\//, $key[$i]))[1];
+
+    if($inputTag eq $keyTag){
+        $correct++;
     }
-} else {
-    die "Error opening input file '$inputFile'";
+    $total++;
 }
+println "CORRECT: ".$correct;
+println "TOTAL: ".$total;
+println ($correct / $total)."%";
