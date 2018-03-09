@@ -59,14 +59,23 @@ if(open(my $fh, "<:encoding(UTF-8)", $test)){
 
     # For each token that's not a phrase boundary bracket,
     # add a / followed by its most likely tag
+    my $flag = 0;
     foreach my $token (@tokens){
         if($token =~ /^\[$/){
-            print "\n".$token." ";
+            if($flag != 0){
+                $flag = 0;
+                print $token." ";
+            }
+            else{
+                print "\n".$token." ";
+            }
         }
         elsif($token =~ /^\]$/){
+            $flag = 1;
             print $token."\n";
         }
         else{
+            $flag = 0;
             if(exists $tags{$token}){
                 $token =~ s/(.*)/$1."\/".$tags{$1}/e;
             } else { # If tag wasn't present in training data, assume NN
