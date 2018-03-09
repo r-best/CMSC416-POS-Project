@@ -7,8 +7,8 @@ sub processInputFile($) {
     my $file = @_[0];
     if(open(my $fh, "<:encoding(UTF-8)", $file)){
         my $text = do { local $/; <$fh> }; # Read in the entire file as a string
-        chomp $text;
         $text =~ s/[\[\]]//g;
+        chomp $text;
         return split(/[\s\n]+/, $text);
         close $file;
     } else {
@@ -38,14 +38,12 @@ my $total = 0;
 
 my %predictions;
 
-my $table = Text::Table->new();
-
 for(my $i = 0; $i < 0+@input; $i++){
     my $inputTag = (split(/(?<!\\)\//, $input[$i]))[1];
     my $keyTag = (split(/(?<!\\)\//, $key[$i]))[1];
-    $inputTag =~ s/^(.*)\|/$1/;
-    $keyTag =~ s/^(.*)\|/$1/;
-
+    $inputTag =~ s/^(.*)\|.*/$1/;
+    $keyTag =~ s/^(.*)\|.*/$1/;
+    
     $predictions{$keyTag}{$inputTag}++;
 
     if($inputTag eq $keyTag){
@@ -53,7 +51,28 @@ for(my $i = 0; $i < 0+@input; $i++){
     }
     $total++;
 }
-println Dumper(%predictions);
+
+my @title = keys %predictions;
+unshift @title, "a";
+my $table = Text::Table->new(@title);
+
+for my $actual (keys %predictions){
+    my @row = ($actual);
+    for my $pred (keys %predictions){
+        if(exists $predictions{$actual}{$pred}){
+            # println $predictions{$actual}{$pred};
+            push @row, $predictions{$actual}{$pred};
+        }
+        else{
+            # println "AAAAAAAAAAAAAAAAAAAA";
+            push @row, 0;
+        }
+    }
+    # println @row;
+    $table->add(@row);
+}
+
+print $table->table();
 println "CORRECT: ".$correct;
 println "TOTAL: ".$total;
-println ($correct / $total)."%";
+println (($correct / $total) * 100)."%";
