@@ -69,7 +69,7 @@ if(open(my $fh, "<:encoding(UTF-8)", $test)){
         else{
             if(exists $tags{$token}){
                 $token =~ s/(.*)/$1."\/".$tags{$1}/e;
-            } else {
+            } else { # If tag wasn't present in training data, assume NN
                 $token =~ s/(.*)/$1."\/NN"/e;
             }
             print $token." ";
