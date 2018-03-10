@@ -1,3 +1,20 @@
+# Assignment 3
+# CMSC 416
+# Due: Mon Mar. 12, 2018
+# Program Summary:
+#   
+# Algorithm:
+#   
+# Usage Format:
+#   
+# Rules:
+#   Base Accuracy: 47976 / 56824 = 84.42911%
+#   With Rule 1: 48002 / 56824 = 84.47487%
+#   With Rule 2: 48353 / 56824 = 85.09257%
+#   With Rule 3: 49006 / 56824 = 86.24173%
+#   With Rule 4:  / 56824 = %
+#   With Rule 5:  / 56824 = %
+
 use Data::Dumper;
 
 sub println { print "@_"."\n" }
@@ -76,7 +93,22 @@ if(open(my $fh, "<:encoding(UTF-8)", $test)){
         }
         else{
             $flag = 0;
-            if(exists $tags{$token}){
+            if($token =~ /[Mm]ost/){
+                # Rule 1: "most" should be an RBS
+                # (It was getting predicted as JJS)
+                $token =~ s/(.*)/$1."\/RBS"/e;
+            }
+            elsif($token =~ /^\d+([\.:]\d+)?$/){
+                # Rule 2: Numbers & times should be CD
+                # (Sometimes getting NN)
+                $token =~ s/(.*)/$1."\/CD"/e;
+            }
+            elsif($token =~ /^[A-Z][A-Za-z]+/){
+                # Rule 3: Words that start with a capital are NNP
+                # (Often getting NN)
+                $token =~ s/(.*)/$1."\/NNP"/e;
+            }
+            elsif(exists $tags{$token}){
                 $token =~ s/(.*)/$1."\/".$tags{$1}/e;
             } else { # If tag wasn't present in training data, assume NN
                 $token =~ s/(.*)/$1."\/NN"/e;
