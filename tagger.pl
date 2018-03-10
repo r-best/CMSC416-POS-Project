@@ -12,8 +12,8 @@
 #   With Rule 1: 48002 / 56824 = 84.47487%
 #   With Rule 2: 48353 / 56824 = 85.09257%
 #   With Rule 3: 49006 / 56824 = 86.24173%
-#   With Rule 4:  / 56824 = %
-#   With Rule 5:  / 56824 = %
+#   With Rule 4: 49019 / 56824 = 86.26461%
+#   With Rule 5: 46994 / 56824 = 82.70097%
 
 use Data::Dumper;
 
@@ -103,10 +103,18 @@ if(open(my $fh, "<:encoding(UTF-8)", $test)){
                 # (Sometimes getting NN)
                 $token =~ s/(.*)/$1."\/CD"/e;
             }
-            elsif($token =~ /^[A-Z][A-Za-z]+/){
-                # Rule 3: Words that start with a capital are NNP
+            elsif($tags{$token} == "NN" && $token =~ /^[A-Z][A-Za-z]+/){
+                # Rule 3: NN's that start with a capital are NNP
                 # (Often getting NN)
                 $token =~ s/(.*)/$1."\/NNP"/e;
+            }
+            elsif($tags{$token} == "NN" && $token =~ /-/){
+                # Rule 4: NN's with a hyphen are actually JJ
+                $token =~ s/(.*)/$1."\/JJ"/e;
+            }
+            elsif($tags{$token} == "NN" && $token =~ /s$/){
+                # Rule 5: NN's that end in an 's' are actually NNS
+                $token =~ s/(.*)/$1."\/NNS"/e;
             }
             elsif(exists $tags{$token}){
                 $token =~ s/(.*)/$1."\/".$tags{$1}/e;
