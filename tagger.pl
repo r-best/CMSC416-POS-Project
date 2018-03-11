@@ -1,12 +1,20 @@
-# Assignment 3
+# Assignment 3 tagger.pl
 # CMSC 416
 # Due: Mon Mar. 12, 2018
 # Program Summary:
-#   
+#   A part-of-speech tagger that takes in pre-tagged training data
+#   and untagged testing data, learns what words get what tags from 
+#   the training, and uses that to correctly tag the testing.
 # Algorithm:
-#   
+#   Reads through the given training data and for each word, records
+#   what it is tagged as most often. It then applies that tag to every
+#   occurrence of the word in the testing data.
 # Usage Format:
-#   
+#   perl tagger.pl training.txt testing.txt
+#       - Will train on the data in training.txt
+#           and output a copy of testing.txt that
+#           has been tagged based on what the program
+#           was trained on.
 # Rules:
 #   Base Accuracy: 47976 / 56824 = 84.42911%
 #   With Rule 1: 48002 / 56824 = 84.47487%
@@ -14,8 +22,7 @@
 #   With Rule 3: 49006 / 56824 = 86.24173%
 #   With Rule 4: 49019 / 56824 = 86.26461%
 #   With Rule 5: 46994 / 56824 = 82.70097%
-
-use Data::Dumper;
+#       - This last one suprisingly hurt the accuracy a bit
 
 sub println { print "@_"."\n" }
 
@@ -76,7 +83,7 @@ if(open(my $fh, "<:encoding(UTF-8)", $test)){
 
     # For each token that's not a phrase boundary bracket,
     # add a / followed by its most likely tag
-    my $flag = 0;
+    my $flag = 0; # Flag used to determine where newlines go, just for making the printout nice
     foreach my $token (@tokens){
         if($token =~ /^\[$/){
             if($flag != 0){
@@ -114,6 +121,8 @@ if(open(my $fh, "<:encoding(UTF-8)", $test)){
             }
             elsif($tags{$token} == "NN" && $token =~ /s$/){
                 # Rule 5: NN's that end in an 's' are actually NNS
+                # This rule suprisingly hurt the accuracy a lot, 
+                # it guess it hurt more NN's than it helped NNS's
                 $token =~ s/(.*)/$1."\/NNS"/e;
             }
             elsif(exists $tags{$token}){

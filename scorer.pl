@@ -1,5 +1,21 @@
+# Assignment 3 scorer.pl
+# CMSC 416
+# Due: Mon Mar. 12, 2018
+# Program Summary:
+#   A program that calculates the accuracy of part-of-speech tagged
+#   text given the text and a gold standard to compare it against.
+# Algorithm:
+#   Reads the POS-tagged text and the gold standard key and compares
+#   them word by word to see where the tagged text differs. Uses a
+#   double hash to keep track of how many times each possible tag
+#   is tagged as every other tag (i.e. how many times NN was tagged
+#   as NN, how many times they were tagged as JJ, how many times they
+#   were tagged as VB, etc.). Uses that data to create a confusion matrix
+#   showing all tags and how often they were tagged correctly.
+# Usage Format:
+#   perl scorer.pl tagged.txt key.txt
+
 use Text::SimpleTable::AutoWidth;
-use Data::Dumper;
 
 sub println { print "@_"."\n" }
 
@@ -43,7 +59,7 @@ my $total = 0;
 
 # A double hash such that each %predictions{someTag} contains a hash
 # of every tag to how often someTag was predicted as tag
-# i.e. in an ideal situation, 
+# i.e. in an ideal situation:
 #       $predictions{NN}{NN} = 50
 #       $predictions{NN}{VB} = 0
 my %predictions;
@@ -89,4 +105,4 @@ for my $actual (keys %predictions){
 print $table->draw();
 println "CORRECT: ".$correct;
 println "TOTAL: ".$total;
-println (($correct / $total) * 100)."%";
+println "ACCURACY: ".(($correct / $total) * 100)."%";
