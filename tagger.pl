@@ -64,7 +64,7 @@ if(open(my $fh, "<:encoding(UTF-8)", $train)){
     # in the global variable %tags
     foreach my $token (keys %tokens){
         my $max = (keys %{$tokens{$token}})[0];
-        foreach my $tag (keys %tokens{$token}){
+        foreach my $tag (keys %{$tokens{$token}}){
             if($tokens{$token}{$tag} > $tokens{$token}{$max}){
                 $max = $tag;
             }
